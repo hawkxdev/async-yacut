@@ -25,11 +25,14 @@ def index_view():
     if form.validate_on_submit():
         custom_id = form.custom_id.data
         if custom_id:
-            if custom_id == 'files':
-                flash('Такая ссылка уже есть.')
-                return render_template('index.html', form=form)
-            if URLMap.query.filter_by(short=custom_id).first() is not None:
-                flash('Такая ссылка уже есть.')
+            allowed_chars = string.ascii_letters + string.digits
+            is_invalid = (
+                custom_id == 'files' or
+                not all(c in allowed_chars for c in custom_id) or
+                URLMap.query.filter_by(short=custom_id).first() is not None
+            )
+            if is_invalid:
+                flash('Предложенный вариант короткой ссылки уже существует.')
                 return render_template('index.html', form=form)
             short = custom_id
         else:
