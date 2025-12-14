@@ -5,7 +5,7 @@ import string
 from flask import abort, flash, redirect, render_template
 
 from yacut import app, db
-from yacut.forms import URLForm
+from yacut.forms import FileUploadForm, URLForm
 from yacut.models import URLMap
 
 
@@ -54,3 +54,14 @@ def redirect_view(short_id):
     if url_map is None:
         abort(404)
     return redirect(url_map.original)
+
+
+@app.route('/files', methods=['GET', 'POST'])
+def files_view():
+    """Страница загрузки файлов на Яндекс Диск."""
+    form = FileUploadForm()
+    results = None
+    if form.validate_on_submit():
+        ...
+        results = []
+    return render_template('files.html', form=form, results=results)

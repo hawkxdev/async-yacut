@@ -14,6 +14,14 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">
         <a class="navbar-brand" href="{{ url_for('index_view') }}">YaCut</a>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index_view') }}">Ссылки</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('files_view') }}">Файлы</a>
+          </li>
+        </ul>
       </div>
     </nav>
 

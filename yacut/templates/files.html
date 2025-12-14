@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  YaCut | Загрузка файлов
+{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h1 class="text-center mb-4">Загрузка файлов</h1>
+      <p class="text-center text-muted mb-4">Загрузите файлы на Яндекс Диск</p>
+
+      <div class="card">
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data" novalidate>
+            {{ form.csrf_token }}
+
+            <div class="mb-3">
+              {{ form.files.label(class='form-label') }}
+              {{ form.files(class='form-control', multiple=true) }}
+              {% if form.files.errors %}
+                {% for error in form.files.errors %}
+                  <p class="text-danger mt-1">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {{ form.submit(class='btn btn-primary w-100') }}
+          </form>
+        </div>
+      </div>
+
+      {% if results is not null %}
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">Загруженные файлы</h5>
+            {% if results %}
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Имя файла</th>
+                    <th>Короткая ссылка</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for result in results %}
+                    <tr>
+                      <td>{{ result.filename }}</td>
+                      <td>
+                        <a href="{{ url_for('redirect_view', short_id=result.short, _external=True) }}" target="_blank">{{ url_for('redirect_view', short_id=result.short, _external=True) }}</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="text-muted">Нет загруженных файлов</p>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
