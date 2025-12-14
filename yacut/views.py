@@ -7,6 +7,7 @@ from flask import abort, flash, redirect, render_template
 from yacut import app, db
 from yacut.forms import FileUploadForm, URLForm
 from yacut.models import URLMap
+from yacut.yadisk import async_upload_files
 
 
 def get_unique_short_id():
@@ -57,11 +58,23 @@ def redirect_view(short_id):
 
 
 @app.route('/files', methods=['GET', 'POST'])
-def files_view():
+async def files_view():
     """Страница загрузки файлов на Яндекс Диск."""
     form = FileUploadForm()
     results = None
     if form.validate_on_submit():
-        ...
+        uploaded = await async_upload_files(form.files.data)
         results = []
+        for item in uploaded:
+            short = get_unique_short_id()
+            url_map = URLMap(
+                original=item['download_url'],
+                short=short
+            )
+            db.session.add(url_map)
+            results.append({
+                'filename': item['filename'],
+                'short': short
+            })
+        db.session.commit()
     return render_template('files.html', form=form, results=results)
