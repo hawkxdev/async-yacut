@@ -2,7 +2,7 @@
 import random
 import string
 
-from flask import flash, render_template
+from flask import abort, flash, redirect, render_template
 
 from yacut import app, db
 from yacut.forms import URLForm
@@ -45,3 +45,12 @@ def index_view():
         db.session.commit()
         return render_template('index.html', form=form, url_map=url_map)
     return render_template('index.html', form=form)
+
+
+@app.route('/<short_id>')
+def redirect_view(short_id):
+    """Переадресация по короткой ссылке."""
+    url_map = URLMap.query.filter_by(short=short_id).first()
+    if url_map is None:
+        abort(404)
+    return redirect(url_map.original)
