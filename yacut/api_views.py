@@ -1,18 +1,14 @@
 """API эндпоинты."""
-import string
-
-from flask import jsonify, request
+from flask import Response, jsonify, request
 
 from yacut import app, db
 from yacut.error_handlers import InvalidAPIUsage
 from yacut.models import URLMap
-from yacut.views import get_unique_short_id
-
-ALLOWED_CHARS = string.ascii_letters + string.digits
+from yacut.views import get_unique_short_id, validate_custom_id
 
 
 @app.route('/api/id/', methods=['POST'])
-def create_short_link():
+def create_short_link() -> tuple[Response, int]:
     """Создание короткой ссылки."""
     data = request.get_json(silent=True)
     if not data:
@@ -21,13 +17,9 @@ def create_short_link():
         raise InvalidAPIUsage('"url" является обязательным полем!')
     custom_id = data.get('custom_id')
     if custom_id:
-        if (len(custom_id) > 16
-                or not all(c in ALLOWED_CHARS for c in custom_id)):
-            raise InvalidAPIUsage(
-                'Указано недопустимое имя для короткой ссылки')
-        if URLMap.query.filter_by(short=custom_id).first() is not None:
-            raise InvalidAPIUsage(
-                'Предложенный вариант короткой ссылки уже существует.')
+        error = validate_custom_id(custom_id)
+        if error:
+            raise InvalidAPIUsage(error)
     url_map = URLMap()
     url_map.from_dict(data)
     if not url_map.short:
@@ -38,7 +30,7 @@ def create_short_link():
 
 
 @app.route('/api/id/<short_id>/', methods=['GET'])
-def get_original_url(short_id):
+def get_original_url(short_id: str) -> tuple[Response, int]:
     """Получение оригинального URL."""
     url_map = URLMap.query.filter_by(short=short_id).first()
     if url_map is None:

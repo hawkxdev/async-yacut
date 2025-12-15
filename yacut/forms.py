@@ -4,6 +4,8 @@ from flask_wtf.file import MultipleFileField
 from wtforms import StringField, SubmitField, URLField
 from wtforms.validators import DataRequired, Length, Optional
 
+from yacut.constants import CUSTOM_ID_MAX_LENGTH
+
 
 class URLForm(FlaskForm):
     """Форма для создания короткой ссылки."""
@@ -14,7 +16,7 @@ class URLForm(FlaskForm):
     )
     custom_id = StringField(
         'Короткая ссылка',
-        validators=[Length(max=16), Optional()]
+        validators=[Length(max=CUSTOM_ID_MAX_LENGTH), Optional()]
     )
     submit = SubmitField('Создать')
 

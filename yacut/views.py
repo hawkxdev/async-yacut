@@ -1,39 +1,49 @@
 """View-функции приложения."""
 import random
-import string
 
 from flask import abort, flash, redirect, render_template
+from werkzeug.wrappers import Response
 
 from yacut import app, db
+from yacut.constants import (
+    ALLOWED_CHARS, CUSTOM_ID_MAX_LENGTH, RESERVED_PATHS, SHORT_ID_LENGTH
+)
 from yacut.forms import FileUploadForm, URLForm
 from yacut.models import URLMap
 from yacut.yadisk import async_upload_files
 
 
-def get_unique_short_id():
+def get_unique_short_id() -> str:
     """Генерация уникального short ID."""
-    characters = string.ascii_letters + string.digits
     while True:
-        short_id = ''.join(random.choices(characters, k=6))
+        short_id = ''.join(random.choices(ALLOWED_CHARS, k=SHORT_ID_LENGTH))
         if URLMap.query.filter_by(short=short_id).first() is None:
             return short_id
 
 
+def validate_custom_id(custom_id: str) -> str | None:
+    """Проверяет custom_id, возвращает ошибку или None если валидный."""
+    if len(custom_id) > CUSTOM_ID_MAX_LENGTH:
+        return 'Указано недопустимое имя для короткой ссылки'
+    if not all(c in ALLOWED_CHARS for c in custom_id):
+        return 'Указано недопустимое имя для короткой ссылки'
+    if custom_id in RESERVED_PATHS:
+        return 'Предложенный вариант короткой ссылки уже существует.'
+    if URLMap.query.filter_by(short=custom_id).first() is not None:
+        return 'Предложенный вариант короткой ссылки уже существует.'
+    return None
+
+
 @app.route('/', methods=['GET', 'POST'])
-def index_view():
+def index_view() -> str:
     """Главная страница."""
     form = URLForm()
     if form.validate_on_submit():
         custom_id = form.custom_id.data
         if custom_id:
-            allowed_chars = string.ascii_letters + string.digits
-            is_invalid = (
-                custom_id == 'files' or
-                not all(c in allowed_chars for c in custom_id) or
-                URLMap.query.filter_by(short=custom_id).first() is not None
-            )
-            if is_invalid:
-                flash('Предложенный вариант короткой ссылки уже существует.')
+            error = validate_custom_id(custom_id)
+            if error:
+                flash(error)
                 return render_template('index.html', form=form)
             short = custom_id
         else:
@@ -49,7 +59,7 @@ def index_view():
 
 
 @app.route('/<short_id>')
-def redirect_view(short_id):
+def redirect_view(short_id: str) -> Response:
     """Переадресация по короткой ссылке."""
     url_map = URLMap.query.filter_by(short=short_id).first()
     if url_map is None:
@@ -58,7 +68,7 @@ def redirect_view(short_id):
 
 
 @app.route('/files', methods=['GET', 'POST'])
-async def files_view():
+async def files_view() -> str:
     """Страница загрузки файлов на Яндекс Диск."""
     form = FileUploadForm()
     results = None
@@ -66,6 +76,13 @@ async def files_view():
         uploaded = await async_upload_files(form.files.data)
         results = []
         for item in uploaded:
+            if not item.get('download_url'):
+                results.append({
+                    'filename': item['filename'],
+                    'short': None,
+                    'error': item.get('error', 'Ошибка загрузки')
+                })
+                continue
             short = get_unique_short_id()
             url_map = URLMap(
                 original=item['download_url'],
