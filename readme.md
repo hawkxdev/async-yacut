@@ -8,7 +8,7 @@ Sergey Sokolkin — [GitHub](https://github.com/hawkxdev/)
 
 ## Tech Stack
 
-- [Python 3.11](https://www.python.org/)
+- [Python 3.7+](https://www.python.org/)
 - [Flask 3.0](https://flask.palletsprojects.com/)
 - [Flask-SQLAlchemy 3.1](https://flask-sqlalchemy.palletsprojects.com/)
 - [Flask-Migrate 4.0](https://flask-migrate.readthedocs.io/)
