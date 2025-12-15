@@ -1,6 +1,8 @@
 """Модели базы данных."""
 from datetime import datetime
 
+from flask import url_for
+
 from yacut import db
 
 
@@ -16,7 +18,9 @@ class URLMap(db.Model):
         """Сериализация объекта в словарь."""
         return dict(
             url=self.original,
-            short_link=self.short,
+            short_link=url_for(
+                'redirect_view', short_id=self.short, _external=True
+            ),
         )
 
     def from_dict(self, data):

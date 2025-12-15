@@ -9,9 +9,7 @@ from yacut.settings import API_HOST, API_VERSION
 DISK_TOKEN = app.config['DISK_TOKEN']
 
 REQUEST_UPLOAD_URL = f'{API_HOST}{API_VERSION}/disk/resources/upload'
-PUBLISH_URL = f'{API_HOST}{API_VERSION}/disk/resources/publish'
-RESOURCES_URL = f'{API_HOST}{API_VERSION}/disk/resources'
-PUBLIC_DOWNLOAD_URL = f'{API_HOST}{API_VERSION}/disk/public/resources/download'
+DOWNLOAD_URL = f'{API_HOST}{API_VERSION}/disk/resources/download'
 
 AUTH_HEADERS = {'Authorization': f'OAuth {DISK_TOKEN}'}
 
@@ -35,42 +33,24 @@ async def async_upload_files(images):
 async def upload_file_and_get_url(session, image):
     """Загружает один файл и возвращает download URL."""
     filename = image.filename
-    file_data = image.read()
+    filedata = image.read()
+    filepath = f'app:/{filename}'
 
-    params = {
-        'path': f'app:/{filename}',
-        'overwrite': 'true'
-    }
     async with session.get(
         REQUEST_UPLOAD_URL,
         headers=AUTH_HEADERS,
-        params=params
+        params={'path': filepath, 'overwrite': 'true'}
     ) as response:
         data = await response.json()
         upload_url = data['href']
 
-    async with session.put(upload_url, data=file_data):
-        pass
-
-    params = {'path': f'app:/{filename}'}
-    async with session.put(
-        PUBLISH_URL,
-        headers=AUTH_HEADERS,
-        params=params
-    ):
+    async with session.put(upload_url, data=filedata):
         pass
 
     async with session.get(
-        RESOURCES_URL,
+        DOWNLOAD_URL,
         headers=AUTH_HEADERS,
-        params=params
-    ) as response:
-        data = await response.json()
-        public_url = data.get('public_url', '')
-
-    async with session.get(
-        PUBLIC_DOWNLOAD_URL,
-        params={'public_key': public_url}
+        params={'path': filepath}
     ) as response:
         data = await response.json()
         download_url = data.get('href', '')

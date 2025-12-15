@@ -45,7 +45,7 @@
           <div class="card-body">
             <h5 class="card-title">Короткая ссылка готова</h5>
             <p class="card-text">
-              <a href="{{ url_for('index_view') }}{{ url_map.short }}" target="_blank">{{ url_for('index_view', _external=True) }}{{ url_map.short }}</a>
+              <a href="{{ url_for('redirect_view', short_id=url_map.short, _external=True) }}" target="_blank">{{ url_for('redirect_view', short_id=url_map.short, _external=True) }}</a>
             </p>
           </div>
         </div>

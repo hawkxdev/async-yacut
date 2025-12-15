@@ -14,8 +14,8 @@ ALLOWED_CHARS = string.ascii_letters + string.digits
 @app.route('/api/id/', methods=['POST'])
 def create_short_link():
     """Создание короткой ссылки."""
-    data = request.get_json()
-    if data is None:
+    data = request.get_json(silent=True)
+    if not data:
         raise InvalidAPIUsage('Отсутствует тело запроса')
     if 'url' not in data:
         raise InvalidAPIUsage('"url" является обязательным полем!')
