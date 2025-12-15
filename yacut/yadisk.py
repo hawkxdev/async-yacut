@@ -6,12 +6,12 @@ from aiohttp import ClientSession
 from werkzeug.datastructures import FileStorage
 
 from yacut import app
-from yacut.settings import API_HOST, API_VERSION
+from yacut.settings import API_HOST
 
 DISK_TOKEN = app.config['DISK_TOKEN']
 
-REQUEST_UPLOAD_URL = f'{API_HOST}{API_VERSION}/disk/resources/upload'
-DOWNLOAD_URL = f'{API_HOST}{API_VERSION}/disk/resources/download'
+REQUEST_UPLOAD_URL = f'{API_HOST}v1/disk/resources/upload'
+DOWNLOAD_URL = f'{API_HOST}v1/disk/resources/download'
 
 AUTH_HEADERS = {'Authorization': f'OAuth {DISK_TOKEN}'}
 

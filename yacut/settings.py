@@ -2,8 +2,7 @@
 import os
 
 
-API_HOST = 'https://cloud-api.yandex.net/'
-API_VERSION = 'v1'
+API_HOST = os.getenv('YADISK_API_HOST', 'https://cloud-api.yandex.net/')
 
 
 class Config:

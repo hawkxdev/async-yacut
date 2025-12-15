@@ -47,7 +47,11 @@
                     <tr>
                       <td>{{ result.filename }}</td>
                       <td>
-                        <a href="{{ url_for('redirect_view', short_id=result.short, _external=True) }}" target="_blank">{{ url_for('redirect_view', short_id=result.short, _external=True) }}</a>
+                        {% if result.short %}
+                          <a href="{{ url_for('redirect_view', short_id=result.short, _external=True) }}" target="_blank">{{ url_for('redirect_view', short_id=result.short, _external=True) }}</a>
+                        {% else %}
+                          <span class="text-danger">{{ result.error or 'Ошибка загрузки' }}</span>
+                        {% endif %}
                       </td>
                     </tr>
                   {% endfor %}
