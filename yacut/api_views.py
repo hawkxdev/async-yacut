@@ -1,4 +1,6 @@
 """API эндпоинты."""
+from typing import Tuple
+
 from flask import Response, jsonify, request
 
 from yacut import app, db
@@ -8,7 +10,7 @@ from yacut.views import get_unique_short_id, validate_custom_id
 
 
 @app.route('/api/id/', methods=['POST'])
-def create_short_link() -> tuple[Response, int]:
+def create_short_link() -> Tuple[Response, int]:
     """Создание короткой ссылки."""
     data = request.get_json(silent=True)
     if not data:
@@ -30,7 +32,7 @@ def create_short_link() -> tuple[Response, int]:
 
 
 @app.route('/api/id/<short_id>/', methods=['GET'])
-def get_original_url(short_id: str) -> tuple[Response, int]:
+def get_original_url(short_id: str) -> Tuple[Response, int]:
     """Получение оригинального URL."""
     url_map = URLMap.query.filter_by(short=short_id).first()
     if url_map is None:

@@ -1,5 +1,6 @@
 """Загрузка файлов на Яндекс Диск."""
 import asyncio
+from typing import Dict, List
 
 import aiohttp
 from aiohttp import ClientSession
@@ -17,8 +18,8 @@ AUTH_HEADERS = {'Authorization': f'OAuth {DISK_TOKEN}'}
 
 
 async def async_upload_files(
-    images: list[FileStorage]
-) -> list[dict[str, str]]:
+    images: List[FileStorage]
+) -> List[Dict[str, str]]:
     """Загружает файлы параллельно."""
     if not images:
         return []
@@ -36,7 +37,7 @@ async def async_upload_files(
 
 async def upload_file_and_get_url(
     session: ClientSession, image: FileStorage
-) -> dict[str, str]:
+) -> Dict[str, str]:
     """Загружает один файл и возвращает download URL."""
     filename = image.filename
     filedata = image.read()

@@ -1,5 +1,6 @@
 """View-функции приложения."""
 import random
+from typing import Optional
 
 from flask import abort, flash, redirect, render_template
 from werkzeug.wrappers import Response
@@ -21,7 +22,7 @@ def get_unique_short_id() -> str:
             return short_id
 
 
-def validate_custom_id(custom_id: str) -> str | None:
+def validate_custom_id(custom_id: str) -> Optional[str]:
     """Проверяет custom_id, возвращает ошибку или None если валидный."""
     if len(custom_id) > CUSTOM_ID_MAX_LENGTH:
         return 'Указано недопустимое имя для короткой ссылки'

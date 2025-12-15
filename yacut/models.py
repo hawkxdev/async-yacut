@@ -1,5 +1,6 @@
 """Модели базы данных."""
 from datetime import datetime
+from typing import Dict
 
 from flask import url_for
 
@@ -17,7 +18,7 @@ class URLMap(db.Model):
     )
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
-    def to_dict(self) -> dict[str, str]:
+    def to_dict(self) -> Dict[str, str]:
         """Сериализация объекта в словарь."""
         return dict(
             url=self.original,
@@ -26,7 +27,7 @@ class URLMap(db.Model):
             ),
         )
 
-    def from_dict(self, data: dict[str, str]) -> None:
+    def from_dict(self, data: Dict[str, str]) -> None:
         """Десериализация данных из словаря."""
         setattr(self, 'original', data['url'])
         if 'custom_id' in data:
