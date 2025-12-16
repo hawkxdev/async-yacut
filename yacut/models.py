@@ -29,6 +29,6 @@ class URLMap(db.Model):
 
     def from_dict(self, data: Dict[str, str]) -> None:
         """Десериализация данных из словаря."""
-        setattr(self, 'original', data['url'])
+        self.original = data['url']
         if 'custom_id' in data:
-            setattr(self, 'short', data['custom_id'])
+            self.short = data['custom_id']

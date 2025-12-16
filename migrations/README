@@ -1,1 +1,6 @@
-Single-database configuration for Flask.
+Конфигурация базы данных для Flask.
+
+Команды:
+    flask db migrate -m "описание"  # Создать миграцию
+    flask db upgrade                # Применить миграции
+    flask db downgrade              # Откатить последнюю миграцию

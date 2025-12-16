@@ -1,12 +1,27 @@
 """API эндпоинты."""
-from typing import Tuple
+from typing import Optional, Tuple
 
 from flask import Response, jsonify, request
 
 from yacut import app, db
+from yacut.constants import (
+    ALLOWED_CHARS, CUSTOM_ID_MAX_LENGTH, INVALID_SHORT_ID_MSG,
+    RESERVED_PATHS, SHORT_ID_EXISTS_MSG
+)
 from yacut.error_handlers import InvalidAPIUsage
 from yacut.models import URLMap
-from yacut.views import get_unique_short_id, validate_custom_id
+from yacut.views import get_unique_short_id
+
+
+def validate_custom_id(custom_id: str) -> Optional[str]:
+    """Валидация формата и уникальности."""
+    if (len(custom_id) > CUSTOM_ID_MAX_LENGTH or
+            not all(c in ALLOWED_CHARS for c in custom_id)):
+        return INVALID_SHORT_ID_MSG
+    if (custom_id in RESERVED_PATHS or
+            URLMap.query.filter_by(short=custom_id).first() is not None):
+        return SHORT_ID_EXISTS_MSG
+    return None
 
 
 @app.route('/api/id/', methods=['POST'])
